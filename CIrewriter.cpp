@@ -362,8 +362,6 @@ int main(int argc, char **argv)
   langOpts.CPlusPlus = 1;
   TargetOptions &TO = compiler.getTargetOpts();
   llvm::Triple T(TO.Triple);
-  compiler.createPreprocessor(clang::TU_Complete);
-  //compiler.getPreprocessorOpts().UsePredefines = false;
   Invocation->setLangDefaults(langOpts,
                               clang::InputKind::Language::CXX,
                               T,
@@ -371,6 +369,8 @@ int main(int argc, char **argv)
                               clang::LangStandard::lang_cxx14);
 
 
+  compiler.createPreprocessor(clang::TU_Complete);
+  compiler.getPreprocessorOpts().UsePredefines = false;
   compiler.createASTContext();
 
   // Initialize rewriter
