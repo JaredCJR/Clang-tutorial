@@ -69,6 +69,7 @@
 #include "clang/Basic/FileManager.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Lex/Preprocessor.h"
+#include "clang/Lex/PreprocessorOptions.h"
 #include "clang/Lex/Lexer.h"
 #include "clang/Basic/Diagnostic.h"
 #include "clang/AST/RecursiveASTVisitor.h"
