@@ -4,7 +4,7 @@
  *
  * This tutorial was written by Robert Ankeney.
  * Send comments to rrankene@gmail.com.
- * 
+ *
  * This tutorial is an example of using the Clang Rewriter class coupled
  * with the RecursiveASTVisitor class to parse and modify C code.
  *
@@ -300,7 +300,8 @@ int main(int argc, char **argv)
   //compiler.createDiagnostics(argc, argv);
 
   // Create an invocation that passes any flags to preprocessor
-  CompilerInvocation *Invocation = new CompilerInvocation;
+  CompilerInvocation *rawInvocation = new CompilerInvocation;
+  std::shared_ptr<CompilerInvocation> Invocation(rawInvocation);
   CompilerInvocation::CreateFromArgs(*Invocation, argv + 1, argv + argc,
                                       compiler.getDiagnostics());
   compiler.setInvocation(Invocation);
@@ -329,15 +330,11 @@ int main(int argc, char **argv)
   // To see what include paths need to be here, try
   // clang -v -c test.c
   // or clang++ for C++ paths as used below:
-  headerSearchOptions.AddPath("/usr/include/c++/4.6",
+  headerSearchOptions.AddPath("/usr/include/c++/7",
           clang::frontend::Angled,
           false,
           false);
-  headerSearchOptions.AddPath("/usr/include/c++/4.6/i686-linux-gnu",
-          clang::frontend::Angled,
-          false,
-          false);
-  headerSearchOptions.AddPath("/usr/include/c++/4.6/backward",
+  headerSearchOptions.AddPath("/usr/include/c++/7/backward",
           clang::frontend::Angled,
           false,
           false);
@@ -345,11 +342,7 @@ int main(int argc, char **argv)
           clang::frontend::Angled,
           false,
           false);
-  headerSearchOptions.AddPath("/usr/local/lib/clang/3.3/include",
-          clang::frontend::Angled,
-          false,
-          false);
-  headerSearchOptions.AddPath("/usr/include/i386-linux-gnu",
+  headerSearchOptions.AddPath("/usr/local/lib/clang/5.0.1/include",
           clang::frontend::Angled,
           false,
           false);
@@ -362,17 +355,21 @@ int main(int argc, char **argv)
 
   // Allow C++ code to get rewritten
   LangOptions langOpts;
-  langOpts.GNUMode = 1; 
-  langOpts.CXXExceptions = 1; 
-  langOpts.RTTI = 1; 
-  langOpts.Bool = 1; 
-  langOpts.CPlusPlus = 1; 
-  Invocation->setLangDefaults(langOpts,
-                              clang::IK_CXX,
-                              clang::LangStandard::lang_cxx0x);
-
+  langOpts.GNUMode = 1;
+  langOpts.CXXExceptions = 1;
+  langOpts.RTTI = 1;
+  langOpts.Bool = 1;
+  langOpts.CPlusPlus = 1;
+  TargetOptions &TO = compiler.getTargetOpts();
+  llvm::Triple T(TO.Triple);
   compiler.createPreprocessor(clang::TU_Complete);
-  compiler.getPreprocessorOpts().UsePredefines = false;
+  //compiler.getPreprocessorOpts().UsePredefines = false;
+  Invocation->setLangDefaults(langOpts,
+                              clang::InputKind::Language::CXX,
+                              T,
+                              compiler.getPreprocessorOpts(),
+                              clang::LangStandard::lang_cxx14);
+
 
   compiler.createASTContext();
 

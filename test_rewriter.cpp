@@ -4,4 +4,7 @@ int main() {
 
 	if( (a && b) || ( b && a)) {
 	}
+
+    if(1)
+        int a = 0;
 }
